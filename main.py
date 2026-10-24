@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import bcrypt
 from fastapi import FastAPI, HTTPException, Request
@@ -9,21 +10,22 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-from fastapi.middleware.cors import CORSMiddleware
+# from fastapi.middleware.cors import CORSMiddleware
+
+IS_PROD = os.environ.get("ENV") == "production"
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if IS_PROD and not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set in production")
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5500",
-        # "http://localhost:5500",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    SessionMiddleware,
+    secret_key=SECRET_KEY or "dev-only-change-me",
+    same_site="lax",
+    https_only=IS_PROD,          # cookie only sent over HTTPS when live
+    max_age=60 * 60 * 24 * 7,
 ) 
 
 DB_FILE = Path(__file__).parent / "app.db"
-app.add_middleware(SessionMiddleware, secret_key="dev-only-change-me")
 
 
 
@@ -66,9 +68,6 @@ def require_pro(request: Request):
 
 init_db()
 
-# @app.get("/")
-# def home():
-#     return {"message": "hello"}
 
 class NewUser(BaseModel):
     username:str
@@ -76,10 +75,14 @@ class NewUser(BaseModel):
 
 @app.post("/register")
 def register(user: NewUser):
+    username = user.username.strip().lower()
     password = user.password.encode()      # bcrypt works on bytes, not text
-
+    if len(username) < 3:
+        raise HTTPException(status_code=400, detail="username must be at least 3 characters")
     if len(password) < 6:
         raise HTTPException(status_code=400, detail="size must be at least 6")
+    if len(password) > 72:
+        raise HTTPException(status_code=400, detail="password is too long (max 72 characters)")
     
     hashed = bcrypt.hashpw(password, bcrypt.gensalt()).decode()
 
@@ -87,7 +90,7 @@ def register(user: NewUser):
     try:    
         cur = conn.execute(
             "INSERT INTO users (username, password) VALUES (?, ?)",
-            (user.username, hashed),
+            (username, hashed),
         )
         conn.commit()
         new_id = cur.lastrowid
@@ -97,17 +100,6 @@ def register(user: NewUser):
         conn.close()
     return {"saved": True, "id": new_id, "message": "Registration successful!"}
 
-@app.get("/users")
-def list_users(username: str | None = None):
-    conn = get_conn()
-    if username:
-        rows = conn.execute(
-            "SELECT username, id, created_at FROM users WHERE username = ? ORDER BY id DESC", (username,)
-        ).fetchall()
-    else:
-        rows = conn.execute("SELECT username, id, created_at FROM users ORDER BY id DESC").fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
 
 @app.post("/login")
 def login(user: NewUser, request: Request):
