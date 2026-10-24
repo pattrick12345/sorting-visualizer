@@ -7,7 +7,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/register",
+            "/register",
             {
                 method: "POST",
                 credentials: "include",

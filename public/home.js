@@ -3,7 +3,7 @@ document.querySelectorAll(".premiumSORT").forEach(link => {
             event.preventDefault();
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/me", {
+        const response = await fetch("/me", {
             credentials: "include"
         });
 
@@ -25,7 +25,7 @@ document.getElementById("log_out").addEventListener("click", async function(even
     event.preventDefault();
 
     try {
-        const response = await fetch("http://127.0.0.1:8000/logout", {
+        const response = await fetch("/logout", {
             method: "POST", 
             credentials: "include"
         });
@@ -44,7 +44,7 @@ document.getElementById("log_in").addEventListener("click", async function(event
 
 async function showUsername() {
     try {
-        const response = await fetch("http://127.0.0.1:8000/me", {
+        const response = await fetch("/me", {
             credentials: "include"
         });
 

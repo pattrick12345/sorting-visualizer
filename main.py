@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
 from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
@@ -14,7 +15,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:5500",
-        "http://localhost:5500",
+        # "http://localhost:5500",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -65,9 +66,9 @@ def require_pro(request: Request):
 
 init_db()
 
-@app.get("/")
-def home():
-    return {"message": "hello"}
+# @app.get("/")
+# def home():
+#     return {"message": "hello"}
 
 class NewUser(BaseModel):
     username:str
@@ -140,3 +141,5 @@ def premium_test(request: Request):
 def logout(request: Request):
     request.session.clear()
     return {"loggedIn": False}
+
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
