@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css">
+        <title>Sorting Visualizer</title>
+
+    </head>
+    <body data-algo="heap">
+        <header class="top">
+            <div class="head">
+                <a href="../index.html">← Home</a>
+                <h1>Heap Sort</h1>
+            </div>
+            <div class="controls">
+                <button id="generate">New Array</button>
+                <button id="sort">Sort</button>
+
+                <label>Size: <span id="elementCount">40</span>
+                    <input type="range" id="size" min="6" max="100" value="40" />
+                </label>
+            </div>
+        </header>
+        <div id="main">
+            <div id="bars"></div>
+            <pre id="code"></pre>
+        </div>
+        
+        <footer>
+            <div id="stats">
+                <p>Bars (n): <span id="nVal">0</span>
+                    &nbsp;|&nbsp; Comparisons: <span id="cmp">0</span> 
+                    &nbsp;|&nbsp; Swaps: <span id="swp">0</span>
+                </p>
+                <p><span id="expectedLabel"></span>: <span id="expected">0</span>
+                    &nbsp;|&nbsp; Time complexity: <span id="timeCx"></span>
+                    &nbsp;|&nbsp; Space: <span id="spaceCx"></span>
+                </p>
+            </div>
+        </footer>
+
+        <script src="../core.js"></script>
+        <script src="../algos/premium/heap.js"></script>
+        <script>start();</script>
+    </body>
+</html>

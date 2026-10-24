@@ -1,0 +1,79 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #111;
+    color: white;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login {
+    background-color: #222;
+    padding: 30px;
+    width: 320px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.login h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+#loginForm , #registerForm {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#loginForm input , #registerForm input {
+    padding: 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    font-size: 15px;
+}
+
+#loginForm input::placeholder , #registerForm input::placeholder {
+    color: #bbb;
+}
+
+#loginForm button , #registerForm button {
+    padding: 12px;
+    background-color: steelblue;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+#loginForm button:hover, #registerForm button:hover {
+    background-color: #4682b4;
+}
+
+#message {
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+nav {
+    margin-top: 20px;
+}
+
+nav a {
+    color: steelblue;
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}

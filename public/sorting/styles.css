@@ -1,0 +1,183 @@
+body {
+    margin: 0;
+    padding-bottom: 40px;
+    font-family: "Space Grotesk", Arial, sans-serif;
+    background: #0e0e10;
+    color: #f1f1f1;
+    text-align: center;
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    /* padding-left: 30px; */
+} 
+
+body a {
+    color: white;
+    text-decoration: none;
+    /* margin-left: 0px; */
+}
+body a:hover {
+  color: steelblue;
+}
+
+.top {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;   /* left | center | right */
+    align-items: center;
+    padding: 0px 40px; 
+
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 6px;
+    background: steelblue;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4a90c2;
+}
+
+label {
+  margin: 0 10px;
+}
+
+#main {
+    display: flex;
+    gap: 10px;
+        padding: 0 30px;
+}
+
+#bars {
+    display: flex;
+    align-items: flex-end;   /* bars grow upward from the bottom */
+    justify-content: left;
+    gap: 2px;
+    height: 400px;
+    width: 50%;
+    /* margin: auto; */
+    border: 2px solid white;
+        
+}
+
+.bar {
+    flex: 1;
+    background: steelblue;
+}
+
+#code {
+    flex: 1; 
+    /* display: flex; */
+    margin: 0;
+    padding: 16px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    text-align: left;
+    font-family: Consolas, monospace;
+    font-size: 15px;
+    height: 400px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.line {
+    white-space: pre;        /* keeps the indentation spaces */
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.line.active {
+    background: #b8860b;     /* the highlight */
+    color: white;
+}
+
+#tally {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 5px;
+}
+
+#tally .lbl {
+    margin-right: 10px;
+    color: #bbb;
+}
+
+#tally .box {
+    width: 48px;
+    text-align: center;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+#tally .box b {
+    display: block;
+    /* padding: 4px; */
+    color: steelblue;
+    border-bottom: 1px solid #444;
+}
+
+#tally .box span {
+    display: block;
+    padding: 4px;
+}
+
+#buckets {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px;
+}
+
+#buckets .bucket {
+    width: 150px;
+    min-height: 70px;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#buckets .bucket.active {
+    border-color: orange;
+}
+
+#buckets .bucket b {
+    display: block;
+    padding: 6px;
+    font-size: 13px;
+    color: steelblue;
+    border-bottom: 1px solid #444;
+}
+
+#buckets .items {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px;
+}
+
+#buckets .items span {
+    padding: 2px 6px;
+    font-size: 12px;
+    background: #2a2a2a;
+    border-radius: 4px;
+}
