@@ -1,63 +1,63 @@
 import os
-import sqlite3
 import bcrypt
+import psycopg
+from psycopg.rows import dict_row
 from fastapi import FastAPI, HTTPException, Request
 from starlette.middleware.sessions import SessionMiddleware
 from pydantic import BaseModel
-from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 
 
 app = FastAPI()
-
-# from fastapi.middleware.cors import CORSMiddleware
 
 IS_PROD = os.environ.get("ENV") == "production"
 SECRET_KEY = os.environ.get("SECRET_KEY")
 if IS_PROD and not SECRET_KEY:
     raise RuntimeError("SECRET_KEY must be set in production")
 
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL must be set")
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=SECRET_KEY or "dev-only-change-me",
     same_site="lax",
-    https_only=IS_PROD,          # cookie only sent over HTTPS when live
+    https_only=IS_PROD,         
     max_age=60 * 60 * 24 * 7,
 ) 
 
-DB_FILE = Path(__file__).parent / "app.db"
-
-
 
 def get_conn():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row      # lets us read columns by name
-    return conn
+    return psycopg.connect(DATABASE_URL, row_factory=dict_row)
+
 def init_db():
     conn = get_conn()
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            username    TEXT    UNIQUE,
-            password    TEXT    NOT NULL,
-            plan        TEXT    NOT NULL DEFAULT 'free',
-            created_at  TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP
+            id          SERIAL  PRIMARY KEY,
+            username    TEXT            NOT NULL UNIQUE,
+            password    TEXT            NOT NULL,
+            plan        TEXT            NOT NULL DEFAULT 'free',
+            created_at  TIMESTAMPTZ     NOT NULL DEFAULT now()
         )
         """
     )
     conn.commit()
     conn.close()
+
 def current_user(request: Request):
     user_id = request.session.get("user_id")
     if not user_id:
         return None
     conn = get_conn()
     row = conn.execute(
-        "SELECT id, username, plan FROM users WHERE id = ?", (user_id,)
+        "SELECT id, username, plan FROM users WHERE id = %s", (user_id,)
     ).fetchone()
     conn.close()
     return row
+
 def require_pro(request: Request):
     user = current_user(request)
     if user is None:
@@ -76,7 +76,7 @@ class NewUser(BaseModel):
 @app.post("/register")
 def register(user: NewUser):
     username = user.username.strip().lower()
-    password = user.password.encode()      # bcrypt works on bytes, not text
+    password = user.password.encode()      
     if len(username) < 3:
         raise HTTPException(status_code=400, detail="username must be at least 3 characters")
     if len(password) < 6:
@@ -89,12 +89,12 @@ def register(user: NewUser):
     conn = get_conn()
     try:    
         cur = conn.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
+            "INSERT INTO users (username, password) VALUES (%s, %s) RETURNING id",
             (username, hashed),
         )
+        new_id = cur.fetchone()["id"]
         conn.commit()
-        new_id = cur.lastrowid
-    except sqlite3.IntegrityError:
+    except psycopg.errors.UniqueViolation:
         raise HTTPException(status_code=400, detail="that username is taken")
     finally:
         conn.close()
@@ -108,7 +108,7 @@ def login(user: NewUser, request: Request):
 
     conn = get_conn()
     row = conn.execute(
-        "SELECT id, username, password FROM users WHERE username = ?", (username,)
+        "SELECT id, username, password FROM users WHERE username = %s", (username,)
     ).fetchone()
     conn.close()
 
